@@ -1,10 +1,17 @@
-from tkinter import filedialog, ttk
+import variables
+import sys
+from tkinter import filedialog, ttk, messagebox
 from tkinter import *
 import pandas as pd
 
 
 class MainWindow:
     def __init__(self, master):
+        """
+        Constructor for MainWindow.
+        :param master: Master TkInter object.
+        """
+        
         self.master = master
         self.width = 500
         self.height = 500
@@ -19,24 +26,13 @@ class MainWindow:
         master.geometry("{}x{}+{}+{}".format(self.width, self.height, x_coords, y_coords))
         master.resizable(0, 0)
 
-        self.tasks = {
-            'D6': ('საპენსიო ასაკის (65+) მამაკაცების რაოდენობა ოჯახში', {}),
-            'E2': (
-                'ვის ეკუთვნის საცხოვრისი, რომელშიც ოჯახი ცხოვრობს',
-                {
-                    1: 'ეკუთვნის შინამეურნეობას',
-                    2: 'დაქირავებულია',
-                    3: 'დაგირავებულია',
-                    4: 'უფასო სარგებლობაშია'
-                }
-            ),
-            'F22': ('გაზქურების/ელექტროქურების რაოდენობა ოჯახში', {}),
-            'S3': ('რამდენი ლარი სჭირდება თვეში, თქვენს ოჯახს სურსათისა და სხვა აუცილებელი ხარჯებისათვის', {}),
-            'I4': ('ოჯახის შემოსავლები ქონების გაქირავებიდან(საშუალოდ თვეში)', {}),
-            'C5': ('ოჯახის დანახარჯები საწვავზე და ელექტროენერგიაზე (ლარი, საშუალოდ თვეში)', {}),
-        }
-
     def draw(self):
+        """
+        Draw main window.
+        :return: void
+        """
+
+        # TODO: Fix widget positions.
         master = self.master
 
         # Create Open Database Button.
@@ -58,8 +54,8 @@ class MainWindow:
 
         # Create Data selector.
         Label(master.lf_parameters, text="მონაცემები:").pack(pady=(10, 5))
-        master.combo_box_data = ttk.Combobox(master.lf_parameters, values=list(self.tasks.keys()))
-        master.combo_box_data.bind('<<ComboboxSelected>>', self.__update_data_details)
+        master.combo_box_data = ttk.Combobox(master.lf_parameters, values=list(variables.tasks.keys()))
+        master.combo_box_data.bind('<<ComboboxSelected>>', self.__combo_box_data_on_select)
         master.combo_box_data.pack()
 
         # Create Action selector.
@@ -67,7 +63,7 @@ class MainWindow:
         master.combo_box_action = ttk.Combobox(master.lf_parameters)
         master.combo_box_action.pack()
 
-        Button(master.lf_parameters, text="დათვლა", command=print('დათვლა'))\
+        Button(master.lf_parameters, text="დათვლა", command=self.__run_calculation)\
             .pack(pady=(20, 0))
 
         master.lf_parameters.pack(ipadx=10, ipady=10)
@@ -82,8 +78,7 @@ class MainWindow:
         lf_data_details = LabelFrame(
             master,
             text="არჩეული მონაცემების დეტალები",
-            width=self.width,
-            height=100
+            width=self.width
         )
 
         master.data_details_label = Label(lf_data_details, text='')
@@ -96,34 +91,83 @@ class MainWindow:
         master.mainloop()
 
     def __import_database(self):
-        master = self.master
+        """
+        Create File Dialog for selecting database file.
+        :return: void
+        """
 
-        master.filename = filedialog.askopenfilename(
+        filename = filedialog.askopenfilename(
             initialdir="data",
             title="აირჩიეთ ბაზა"
         )
+        
+        self.__read_database(filename) 
+        
+    def __read_database(self, filename):
+        """
+        Read database file.
+        :param filename: File path for reading.
+        :return: void
+        """
 
-        xl_workbook = pd.ExcelFile(master.filename)
+        master = self.master
+
+        try:
+            xl_workbook = pd.ExcelFile(filename)
+        except Exception:
+            messagebox.showerror('შეცდომა', 'აირჩიეთ სწორი მონაცემთა ბაზა.')
+            return 
+
+        # Read the first sheet.
         df = xl_workbook.parse(0)
 
+        # Get regions from database and put to regions Combo Box.
         master.combo_box_region['values'] = list(dict.fromkeys(df['რეგიონი'].tolist()))
 
+        # Enable all elements into frame.
         self.__change_children_state(master.lf_parameters, NORMAL)
+
+        self.excel_data = df
 
     @staticmethod
     def __change_children_state(widget, state=DISABLED):
+        """
+        Change state to given widget children.
+        :param widget: Widget for changing.
+        :param state:  New state.
+        :return: void
+        """
+
         for child in widget.winfo_children():
             try:
                 child.configure(state=state)
             except:
                 pass
 
-    def __update_data_details(self, event):
-        master = self.master
-        selected_data = master.combo_box_data.get()
-        selected_data_description = self.tasks.get(selected_data)[0]
-        selected_data_codes = self.tasks.get(selected_data)[1]
+    def __combo_box_data_on_select(self, event):
+        """
+        Select event for combo_box_data.
+        :param event: Current event.
+        :return: void
+        """
 
+        master = self.master
+        selected_data_code = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data_code)
+        selected_data_description = selected_data_details.get('description')
+        selected_data_codes = selected_data_details.get('codes')
+        selected_data_actions = selected_data_details.get('actions')
+
+        # Set Available actions to actions Combo Box.
+        available_actions = []
+        master.combo_box_action.set('')
+        for action in selected_data_actions:
+            available_actions.append(
+                list(variables.actions.keys())[list(variables.actions.values()).index(action)]
+            )
+        master.combo_box_action['values'] = available_actions
+
+        # Set text to Data Details panel.
         selected_data_codes_text = ""
         for code, description in selected_data_codes.items():
             selected_data_codes_text += "%s: %s\n" % (code, description)
@@ -133,4 +177,72 @@ class MainWindow:
                            "კოდების მნიშვნელობები:\n %s"
 
         master.data_details_label['text'] \
-            = details_template % (selected_data, selected_data_description, selected_data_codes_text)
+            = details_template % (selected_data_code, selected_data_description, selected_data_codes_text)
+
+    def __run_calculation(self):
+        master = self.master
+        selected_region = master.combo_box_region.get()
+        selected_data = master.combo_box_data.get()
+        selected_action = master.combo_box_action.get()
+        
+        if selected_region == '':
+            messagebox.showerror('შეცდომა', 'აირჩიეთ რეგიონი!')
+            master.combo_box_region.focus_set()
+        elif selected_data == '':
+            messagebox.showerror('შეცდომა', 'აირჩიეთ მონაცემები!')
+            master.combo_box_data.focus_set()
+        elif selected_action == '':
+            messagebox.showerror('შეცდომა', 'აირჩიეთ მოქმედება!')
+            master.combo_box_action.focus_set()
+        else:
+            # Filter data by region.
+            df = self.excel_data
+            
+            # Filter by given region and column.
+            data = df[df["რეგიონი"] == selected_region]
+            data = data[variables.tasks.get(selected_data).get('index')]
+            
+            calculators = {
+                # 1: self.__calculate_action_1,
+                # 2: self.__calculate_action_2,
+                # 3: self.__calculate_action_3,
+                # 4: self.__calculate_action_4,
+                # 5: self.__calculate_action_5,
+                6: self.__calculate_action_6,
+                7: self.__calculate_action_7,
+                8: self.__calculate_action_8,
+                # 9: self.__calculate_action_9,
+                # 10: self.__calculate_action_10,
+            }
+
+            selected_action_code = variables.actions.get(selected_action)
+            calculators.get(selected_action_code)(data)
+            
+            # try:
+            #     
+            # except Exception:
+            #     pass
+
+    def __calculate_action_6(self, data):
+        """
+        Calculate Average of given data.
+        :param data: Data.
+        :return: void
+        """
+        print(data.mean())
+        
+    def __calculate_action_7(self, data):
+        """
+        Calculate Median of given data.
+        :param data: Data.
+        :return: void
+        """
+        print(data.median())
+        
+    def __calculate_action_8(self, data):
+        """
+        Calculate Mode of given data.
+        :param data: Data.
+        :return: void
+        """
+        print(int(data.mode()))
