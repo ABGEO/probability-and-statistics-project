@@ -1,5 +1,5 @@
 import variables
-import sys
+from ChartWindow import ChartWindow
 from tkinter import filedialog, ttk, messagebox
 from tkinter import *
 import pandas as pd
@@ -61,10 +61,11 @@ class MainWindow:
         # Create Action selector.
         Label(master.lf_parameters, text="მოქმედება:").pack(pady=(10, 5))
         master.combo_box_action = ttk.Combobox(master.lf_parameters)
+        master.combo_box_action.bind('<<ComboboxSelected>>', self.__combo_box_action_on_select)
         master.combo_box_action.pack()
 
-        Button(master.lf_parameters, text="დათვლა", command=self.__run_calculation)\
-            .pack(pady=(20, 0))
+        master.calculate_btn = Button(master.lf_parameters, text="დათვლა", command=self.__run_calculation)
+        master.calculate_btn.pack(pady=(20, 0))
 
         master.lf_parameters.pack(ipadx=10, ipady=10)
 
@@ -179,6 +180,22 @@ class MainWindow:
         master.data_details_label['text'] \
             = details_template % (selected_data_code, selected_data_description, selected_data_codes_text)
 
+    def __combo_box_action_on_select(self, event):
+        """
+        Select event for combo_box_action.
+        :param event: Current event.
+        :return: void
+        """
+
+        master = self.master
+        selected_action = master.combo_box_action.get()
+        selected_action_code = variables.actions.get(selected_action)
+
+        if selected_action_code in [2, 3, 4, 5]:
+            master.calculate_btn['text'] = 'დიაგრამის ჩვენება'
+        else:
+            master.calculate_btn['text'] = 'დათვლა'
+
     def __run_calculation(self):
         master = self.master
         selected_region = master.combo_box_region.get()
@@ -204,7 +221,7 @@ class MainWindow:
             
             calculators = {
                 # 1: self.__calculate_action_1,
-                # 2: self.__calculate_action_2,
+                2: self.__calculate_action_2,
                 # 3: self.__calculate_action_3,
                 # 4: self.__calculate_action_4,
                 # 5: self.__calculate_action_5,
@@ -223,12 +240,39 @@ class MainWindow:
             # except Exception:
             #     pass
 
+    def __calculate_action_2(self, data):
+        """
+        Draw bar chart.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_description = selected_data_details.get('description')
+        selected_data_codes = selected_data_details.get('codes')
+
+        new_data = {}
+        for code, description in selected_data_codes.items():
+            new_data[code] = {
+                'description': description,
+                'count': 0,
+            }
+
+        for i in list(data):
+            new_data[i]['count'] += 1
+
+        chart = ChartWindow('სვეტოვანი დიაგრამა')
+        chart.bar_chart(selected_data_description, new_data)
+
     def __calculate_action_6(self, data):
         """
         Calculate Average of given data.
         :param data: Data.
         :return: void
         """
+
         print(data.mean())
         
     def __calculate_action_7(self, data):
@@ -237,6 +281,7 @@ class MainWindow:
         :param data: Data.
         :return: void
         """
+
         print(data.median())
         
     def __calculate_action_8(self, data):
@@ -245,4 +290,5 @@ class MainWindow:
         :param data: Data.
         :return: void
         """
+
         print(int(data.mode()))
