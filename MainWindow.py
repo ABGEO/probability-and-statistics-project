@@ -223,7 +223,7 @@ class MainWindow:
                 # 1: self.__calculate_action_1,
                 2: self.__calculate_action_2,
                 # 3: self.__calculate_action_3,
-                # 4: self.__calculate_action_4,
+                4: self.__calculate_action_4,
                 # 5: self.__calculate_action_5,
                 6: self.__calculate_action_6,
                 7: self.__calculate_action_7,
@@ -265,6 +265,32 @@ class MainWindow:
 
         chart = ChartWindow('სვეტოვანი დიაგრამა')
         chart.bar_chart(selected_data_description, new_data)
+
+    def __calculate_action_4(self, data):
+        """
+        Draw pie chart.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_description = selected_data_details.get('description')
+        selected_data_codes = selected_data_details.get('codes')
+
+        new_data = {}
+        for code, description in selected_data_codes.items():
+            new_data[code] = {
+                'description': description,
+                'count': 0,
+            }
+
+        for i in list(data):
+            new_data[i]['count'] += 1
+
+        chart = ChartWindow('წრიული დიაგრამა', width=600, height=600)
+        chart.pie_chart(selected_data_description, new_data)
 
     def __calculate_action_6(self, data):
         """
