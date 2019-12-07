@@ -263,7 +263,7 @@ class MainWindow:
         for i in list(data):
             new_data[i]['count'] += 1
 
-        chart = ChartWindow('სვეტოვანი დიაგრამა')
+        chart = ChartWindow('სვეტოვანი დიაგრამა', width=600, height=600)
         chart.bar_chart(selected_data_description, new_data)
 
     def __calculate_action_4(self, data):

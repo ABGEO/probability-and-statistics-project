@@ -10,3 +10,4 @@
 ## გამოყეებული ტექნოლოგიები
 - TkInter
 - Pandas
+- Matplotlib
