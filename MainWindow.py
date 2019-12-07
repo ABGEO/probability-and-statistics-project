@@ -236,11 +236,6 @@ class MainWindow:
 
             selected_action_code = variables.actions.get(selected_action)
             calculators.get(selected_action_code)(data)
-            
-            # try:
-            #     
-            # except Exception:
-            #     pass
 
     def __calculate_action_2(self, data):
         """
@@ -316,32 +311,38 @@ class MainWindow:
         chart = ChartWindow('გაბნევის დიაგრამა', width=600, height=600)
         chart.scatter_chart(selected_data_description, list(data), list(data2))
 
-    def __calculate_action_6(self, data):
+    @staticmethod
+    def __calculate_action_6(data):
         """
         Calculate Average of given data.
         :param data: Data.
         :return: void
         """
 
-        print(data.mean())
-        
-    def __calculate_action_7(self, data):
+        avg = float(data.mean())
+        messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების საშუალოა: %f' % avg)
+
+    @staticmethod
+    def __calculate_action_7(data):
         """
         Calculate Median of given data.
         :param data: Data.
         :return: void
         """
 
-        print(data.median())
+        median = float(data.median())
+        messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების მედიანაა: %f' % median)
         
-    def __calculate_action_8(self, data):
+    @staticmethod
+    def __calculate_action_8(data):
         """
         Calculate Mode of given data.
         :param data: Data.
         :return: void
         """
 
-        print(int(data.mode()))
+        mode = float(data.mode())
+        messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების მოდაა: %f' % mode)
 
     def __calculate_action_10(self, data):
         """
@@ -354,7 +355,6 @@ class MainWindow:
         df = self.excel_data
         selected_data = master.combo_box_data.get()
         selected_data_details = variables.tasks.get(selected_data)
-        selected_data_description = selected_data_details.get('description')
         selected_data_additional_index = selected_data_details.get('additional_index')
 
         selected_region = master.combo_box_region.get()
@@ -362,4 +362,5 @@ class MainWindow:
         data2 = df[df["რეგიონი"] == selected_region]
         data2 = data2[selected_data_additional_index]
 
-        print(np.corrcoef(data, data2))
+        correlation = np.corrcoef(data, data2)
+        messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების კორელაციის კოეფიციენტია: %f' % correlation.item(1))
