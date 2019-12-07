@@ -1,7 +1,7 @@
 from tkinter import *
 from pandas import DataFrame
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 
 class ChartWindow:
@@ -47,7 +47,6 @@ class ChartWindow:
         self.master.mainloop()
 
     def pie_chart(self, title, data):
-        # TODO: Fix labels and sizes.
         labels = []
         counts = []
         for item in data.values():
@@ -64,9 +63,19 @@ class ChartWindow:
 
         figure = plt.Figure(figsize=(6, 5), dpi=100)
         ax = figure.add_subplot(111)
-        bar = FigureCanvasTkAgg(figure, self.master)
-        bar.get_tk_widget().pack(side=LEFT, fill=BOTH)
-        df.plot(kind='pie', subplots=True, legend=True, ax=ax, autopct='%1.1f%%')
+        pie = FigureCanvasTkAgg(figure, self.master)
+        pie.get_tk_widget().pack(side=LEFT, fill=BOTH)
+        df.plot(kind='pie', subplots=True, labeldistance=None, legend=True,
+                ax=ax, autopct='%1.1f%%', shadow=True, startangle=90)
+        plt.axis('equal')
         ax.set_title(title)
+        ax.yaxis.set_label_text("")
+        ax.xaxis.set_label_text("")
+        pie.draw()
+
+        # Add toolbar.
+        toolbar = NavigationToolbar2Tk(pie, self.master)
+        toolbar.update()
+        pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         self.master.mainloop()
