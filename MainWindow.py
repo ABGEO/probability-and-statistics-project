@@ -224,7 +224,7 @@ class MainWindow:
                 2: self.__calculate_action_2,
                 # 3: self.__calculate_action_3,
                 4: self.__calculate_action_4,
-                # 5: self.__calculate_action_5,
+                5: self.__calculate_action_5,
                 6: self.__calculate_action_6,
                 7: self.__calculate_action_7,
                 8: self.__calculate_action_8,
@@ -291,6 +291,28 @@ class MainWindow:
 
         chart = ChartWindow('წრიული დიაგრამა', width=600, height=600)
         chart.pie_chart(selected_data_description, new_data)
+
+    def __calculate_action_5(self, data):
+        """
+        Draw Scatter chart.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        df = self.excel_data
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_description = selected_data_details.get('description')
+        selected_data_additional_index = selected_data_details.get('additional_index')
+
+        selected_region = master.combo_box_region.get()
+
+        data2 = df[df["რეგიონი"] == selected_region]
+        data2 = data2[selected_data_additional_index]
+
+        chart = ChartWindow('გაბნევის დიაგრამა', width=600, height=600)
+        chart.scatter_chart(selected_data_description, list(data), list(data2))
 
     def __calculate_action_6(self, data):
         """

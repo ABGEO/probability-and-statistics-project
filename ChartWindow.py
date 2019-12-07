@@ -82,3 +82,23 @@ class ChartWindow:
         pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         self.master.mainloop()
+
+    def scatter_chart(self, title, data1, data2):
+        df = DataFrame({'x': data2, 'y': data1})
+
+        figure = plt.Figure(figsize=(6, 5), dpi=100)
+        ax = figure.add_subplot(111)
+        pie = FigureCanvasTkAgg(figure, self.master)
+        pie.get_tk_widget().pack(side=LEFT, fill=BOTH)
+        df.plot(x='x', y='y', kind='scatter', ax=ax)
+        ax.set_title(title)
+        ax.yaxis.set_label_text("")
+        ax.xaxis.set_label_text("")
+        pie.draw()
+
+        # Add toolbar.
+        toolbar = NavigationToolbar2Tk(pie, self.master)
+        toolbar.update()
+        pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        self.master.mainloop()
