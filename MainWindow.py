@@ -1,3 +1,5 @@
+import numpy as np
+
 import variables
 from ChartWindow import ChartWindow
 from tkinter import filedialog, ttk, messagebox
@@ -229,7 +231,7 @@ class MainWindow:
                 7: self.__calculate_action_7,
                 8: self.__calculate_action_8,
                 # 9: self.__calculate_action_9,
-                # 10: self.__calculate_action_10,
+                10: self.__calculate_action_10,
             }
 
             selected_action_code = variables.actions.get(selected_action)
@@ -340,3 +342,24 @@ class MainWindow:
         """
 
         print(int(data.mode()))
+
+    def __calculate_action_10(self, data):
+        """
+        Calculate Correlation.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        df = self.excel_data
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_description = selected_data_details.get('description')
+        selected_data_additional_index = selected_data_details.get('additional_index')
+
+        selected_region = master.combo_box_region.get()
+
+        data2 = df[df["რეგიონი"] == selected_region]
+        data2 = data2[selected_data_additional_index]
+
+        print(np.corrcoef(data, data2))
