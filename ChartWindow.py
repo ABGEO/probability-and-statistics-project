@@ -102,3 +102,21 @@ class ChartWindow:
         pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         self.master.mainloop()
+
+    def linear_chart(self, title, data):
+        df = DataFrame({'კვარტილი': list(data.keys()), 'დანახარჯების ჯამი': list(data.values())})
+
+        figure = plt.Figure(figsize=(6, 5), dpi=100)
+        ax = figure.add_subplot(111)
+        pie = FigureCanvasTkAgg(figure, self.master)
+        pie.get_tk_widget().pack(side=LEFT, fill=BOTH)
+        df.plot(x='კვარტილი', y='დანახარჯების ჯამი', ax=ax)
+        ax.set_title(title)
+        pie.draw()
+
+        # Add toolbar.
+        toolbar = NavigationToolbar2Tk(pie, self.master)
+        toolbar.update()
+        pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        self.master.mainloop()

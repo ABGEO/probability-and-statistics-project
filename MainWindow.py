@@ -232,7 +232,7 @@ class MainWindow:
             calculators = {
                 # 1: self.__calculate_action_1,
                 2: self.__calculate_action_2,
-                # 3: self.__calculate_action_3,
+                3: self.__calculate_action_3,
                 4: self.__calculate_action_4,
                 5: self.__calculate_action_5,
                 6: self.__calculate_action_6,
@@ -270,6 +270,32 @@ class MainWindow:
 
         chart = ChartWindow('სვეტოვანი დიაგრამა', width=600, height=600)
         chart.bar_chart(selected_data_description, new_data)
+
+    def __calculate_action_3(self, data):
+        """
+        Draw Linear chart.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        df = self.excel_data
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_index = selected_data_details.get('index')
+        selected_data_description = selected_data_details.get('description')
+
+        selected_region = master.combo_box_region.get()
+
+        data = df[df["რეგიონი"] == selected_region]
+        quarter_data = {}
+        for quart in range(1, 5):
+            current_quarter_data = data[data["კვარტ"] == quart]
+            current_quarter_data = current_quarter_data[selected_data_index]
+            quarter_data[str(quart) + " კვარტილი"] = current_quarter_data.sum()
+
+        chart = ChartWindow('ხაზოვანი დიაგრამა', width=600, height=600)
+        chart.linear_chart(selected_data_description, quarter_data)
 
     def __calculate_action_4(self, data):
         """
