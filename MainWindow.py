@@ -84,7 +84,7 @@ class MainWindow:
             width=self.width
         )
 
-        master.data_details_label = Label(lf_data_details, text='')
+        master.data_details_label = Label(lf_data_details, text='', wraplength=self.width-20, justify=LEFT)
         master.data_details_label.pack(padx=0, pady=0)
 
         lf_data_details.pack(side=BOTTOM, ipadx=10, ipady=10)
@@ -160,6 +160,7 @@ class MainWindow:
         selected_data_description = selected_data_details.get('description')
         selected_data_codes = selected_data_details.get('codes')
         selected_data_actions = selected_data_details.get('actions')
+        selected_data_additional_index = selected_data_details.get('additional_index', -1)
 
         # Set Available actions to actions Combo Box.
         available_actions = []
@@ -176,11 +177,18 @@ class MainWindow:
             selected_data_codes_text += "%s: %s\n" % (code, description)
 
         details_template = "არჩეული მონაცემების ნომერი: %s\n\n" \
-                           "მონაცემების აღწერა: %s\n\n" \
-                           "კოდების მნიშვნელობები:\n %s"
+                           "მონაცემების აღწერა:\n%s\n\n"
+        template_data = (selected_data_code, selected_data_description)
 
-        master.data_details_label['text'] \
-            = details_template % (selected_data_code, selected_data_description, selected_data_codes_text)
+        if selected_data_codes_text != "":
+            details_template += "კოდების მნიშვნელობები:\n%s"
+            template_data = template_data + (selected_data_codes_text, )
+
+        if selected_data_additional_index != -1:
+            details_template += "დამატებითი ველი: %s"
+            template_data = template_data + (selected_data_additional_index, )
+
+        master.data_details_label['text'] = details_template % template_data
 
     def __combo_box_action_on_select(self, event):
         """
