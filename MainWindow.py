@@ -1,9 +1,10 @@
-import numpy as np
-
-import variables
+from statistics import variance
 from ChartWindow import ChartWindow
 from tkinter import filedialog, ttk, messagebox
 from tkinter import *
+
+import numpy as np
+import variables
 import pandas as pd
 
 
@@ -238,7 +239,7 @@ class MainWindow:
                 6: self.__calculate_action_6,
                 7: self.__calculate_action_7,
                 8: self.__calculate_action_8,
-                # 9: self.__calculate_action_9,
+                9: self.__calculate_action_9,
                 10: self.__calculate_action_10,
             }
 
@@ -377,6 +378,17 @@ class MainWindow:
 
         mode = float(data.mode())
         messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების მოდაა: %f' % mode)
+
+    @staticmethod
+    def __calculate_action_9(data):
+        """
+        Calculate variance of given data.
+        :param data: Data.
+        :return: void
+        """
+
+        var = variance(data)
+        messagebox.showinfo('ინფორმაცია', 'მოცემული მონაცემების დისპერსიაა: %f' % var)
 
     def __calculate_action_10(self, data):
         """

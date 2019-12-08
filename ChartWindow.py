@@ -1,7 +1,8 @@
 from tkinter import *
 from pandas import DataFrame
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
+import matplotlib.pyplot as plt
 
 
 class ChartWindow:
