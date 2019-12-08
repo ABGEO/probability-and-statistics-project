@@ -1,12 +1,8 @@
-from tkinter import Tk
 from MainWindow import *
 
 
-def main():
+if __name__ == '__main__':
     root = Tk()
+    root.iconphoto(True, PhotoImage(file="./resources/icon.png"))
     main_window = MainWindow(root)
     main_window.draw()
-
-
-if __name__ == '__main__':
-    main()
