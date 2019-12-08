@@ -231,7 +231,7 @@ class MainWindow:
             data = data[variables.tasks.get(selected_data).get('index')]
             
             calculators = {
-                # 1: self.__calculate_action_1,
+                1: self.__calculate_action_1,
                 2: self.__calculate_action_2,
                 3: self.__calculate_action_3,
                 4: self.__calculate_action_4,
@@ -245,6 +245,21 @@ class MainWindow:
 
             selected_action_code = variables.actions.get(selected_action)
             calculators.get(selected_action_code)(data)
+
+    def __calculate_action_1(self, data):
+        """
+        Draw Distribution chart.
+        :param data: Data.
+        :return: void
+        """
+
+        master = self.master
+        selected_data = master.combo_box_data.get()
+        selected_data_details = variables.tasks.get(selected_data)
+        selected_data_description = selected_data_details.get('description')
+
+        chart = ChartWindow('სიხშირული განაწილება', width=600, height=600)
+        chart.distribution_chart(selected_data_description, data)
 
     def __calculate_action_2(self, data):
         """

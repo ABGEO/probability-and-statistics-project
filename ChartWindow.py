@@ -121,3 +121,23 @@ class ChartWindow:
         pie.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
 
         self.master.mainloop()
+
+    def distribution_chart(self, title, data):
+        df = DataFrame({'რაოდენობა': data})
+
+        figure = plt.Figure(figsize=(6, 5), dpi=100)
+        ax = figure.add_subplot(111)
+        hist = FigureCanvasTkAgg(figure, self.master)
+        hist.get_tk_widget().pack(side=LEFT, fill=BOTH)
+        df.plot(kind='hist', ax=ax, bins=50)
+        ax.set_title(title)
+        ax.yaxis.set_label_text("რაოდენობა")
+        ax.xaxis.set_label_text("დიაპაზონი")
+        hist.draw()
+
+        # Add toolbar.
+        toolbar = NavigationToolbar2Tk(hist, self.master)
+        toolbar.update()
+        hist.get_tk_widget().pack(side=TOP, fill=BOTH, expand=1)
+
+        self.master.mainloop()
